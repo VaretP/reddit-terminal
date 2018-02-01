@@ -31,9 +31,9 @@ Press `q` or `Q` to leave the subreddit.
 
 ## Screenshots
 
-![config](https://imgur.com/PpZcsua)
+![home](https://i.imgur.com/PpZcsua.png)
 
-![config](https://imgur.com/0rq21zy)
+![sub](https://i.imgur.com/0rq21zy.png)
 
-![config](https://imgur.com/301vtOE)
+![post](https://i.imgur.com/301vtOE.png)
 
