@@ -30,10 +30,8 @@ def try_connection(url):
     try:
         return uReq(url)
     except HTTPError as e:
-        if e.code == 429:
-            time.sleep(2);
-            return try_connection(url)
-        raise
+        time.sleep(2);
+        return try_connection(url)
 
 def navigate(sub_r, ranking, stdscr, window, text_window):
     name = sub_r
