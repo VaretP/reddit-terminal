@@ -1,37 +1,40 @@
 #!/usr/bin/env python
 
-import sys
 import curses as cs
 import webbrowser
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 from pyfiglet import figlet_format
 
+
 def look(entry, midcol, domain_r):
-    domain = entry.div.find('span', {'class':'domain'}).a['href']
-    title_div = entry.div.p.a 
+    domain = entry.div.find('span', {'class': 'domain'}).a['href']
+    title_div = entry.div.p.a
     link = ''
     if domain not in ['/domain/i.redd.it/', domain_r]:
         link = title_div['href']
     comments = entry.div.ul.a['href']
     title = title_div.text
-    time = entry.div.find('p', {'class':'tagline '}).time.text    
-    score = midcol.find('div', {'class':'score unvoted'}).text
+    time = entry.div.find('p', {'class': 'tagline '}).time.text
+    score = midcol.find('div', {'class': 'score unvoted'}).text
     return(title, domain, link, comments, score, time)
+
 
 def display(name, n, infos, text_window):
     text_window.refresh()
     text_window.clear()
     text_window.addstr(figlet_format(name, font='big'))
-    text_window.addstr(str(n + 1) + ' : ' + infos[0] + '\nSubmitted '\
+    text_window.addstr(str(n + 1) + ' : ' + infos[0] + '\nSubmitted '
                        + infos[5] + '\nScore = ' + infos[4])
+
 
 def try_connection(url):
     try:
         return uReq(url)
     except HTTPError as e:
-        time.sleep(2);
+        time.sleep(2)
         return try_connection(url)
+
 
 def navigate(sub_r, ranking, stdscr, window, text_window):
     name = sub_r
@@ -45,15 +48,15 @@ def navigate(sub_r, ranking, stdscr, window, text_window):
     html = uClient.read()
     uClient.close()
     page_soup = soup(html, 'html.parser')
-    entries = page_soup.findAll('div', {'class':'entry unvoted'})
-    midcols = page_soup.findAll('div', {'class':'midcol unvoted'})
+    entries = page_soup.findAll('div', {'class': 'entry unvoted'})
+    midcols = page_soup.findAll('div', {'class': 'midcol unvoted'})
     n_max = len(entries) - 1
     n = -1
     text_window.refresh()
     text_window.clear()
     text_window.addstr(figlet_format(name, font='big'))
     text_window.addstr('Welcome to the ' + name + ' subreddit !')
-    stdscr.addstr(cs.LINES - 1, 0, ' (N)New (H)Hot (T)Top (Q)Quit        '\
+    stdscr.addstr(cs.LINES - 1, 0, ' (N)New (H)Hot (T)Top (Q)Quit        '
                   + '              ')
     if ranking == 'n':
         stdscr.chgat(cs.LINES - 1, 1, 3, cs.A_BOLD | cs.color_pair(3))
@@ -72,14 +75,14 @@ def navigate(sub_r, ranking, stdscr, window, text_window):
             n += 1
             if n > n_max:
                 n = 0
-            display(name, n, look(entries[n], midcols[n], domain_r),\
+            display(name, n, look(entries[n], midcols[n], domain_r),
                     text_window)
         elif char == 65:
-        	n -= 1
-        	if n < 0:
-        	    n = n_max
-        	display(name, n, look(entries[n], midcols[n], domain_r),\
-                        text_window)
+            n -= 1
+            if n < 0:
+                n = n_max
+            display(name, n, look(entries[n], midcols[n], domain_r),
+                    text_window)
         elif char == 67 or char == 68:
             (title, domain, link, comments, score, time) \
                     = look(entries[n], midcols[n], domain_r)
@@ -103,6 +106,7 @@ def navigate(sub_r, ranking, stdscr, window, text_window):
         text_window.noutrefresh()
         cs.doupdate()
 
+
 def main():
     stdscr = cs.initscr()
     cs.noecho()
@@ -113,25 +117,20 @@ def main():
     cs.init_pair(1, cs.COLOR_RED, cs.COLOR_BLACK)
     cs.init_pair(2, cs.COLOR_GREEN, cs.COLOR_BLACK)
     cs.init_pair(3, cs.COLOR_BLUE, cs.COLOR_BLACK)
-    
     stdscr.addstr(" Reddit Terminal", cs.A_REVERSE)
     stdscr.chgat(-1, cs.A_REVERSE)
-    
-    stdscr.addstr(cs.LINES - 1, 0, ' Press (I) to enter a subreddit, '\
+    stdscr.addstr(cs.LINES - 1, 0, ' Press (I) to enter a subreddit, '
                   + 'Press (Q) to leave')
     stdscr.chgat(cs.LINES - 1, 7, 3, cs.A_BOLD | cs.color_pair(2))
     stdscr.chgat(cs.LINES - 1, 39, 3, cs.A_BOLD | cs.color_pair(1))
-    
     window = cs.newwin(cs.LINES - 2, cs.COLS, 1, 0)
-    text_window = window.subwin(cs.LINES - 6, cs.COLS - 4, 3, 3) 
+    text_window = window.subwin(cs.LINES - 6, cs.COLS - 4, 3, 3)
     text_window.addstr(figlet_format('Reddit', font='big'))
-    window.box() 
-
+    window.box()
     stdscr.noutrefresh()
     window.noutrefresh()
-    
     cs.doupdate()
-    text_window.scrollok(1) 
+    text_window.scrollok(1)
     while 1:
         char = window.getch()
         if char == ord('i') or char == ord('I'):
@@ -146,7 +145,7 @@ def main():
             cs.curs_set(0)
             cs.noecho()
             navigate(s.decode('utf-8'), 'n',  stdscr, window, text_window)
-            stdscr.addstr(cs.LINES - 1, 0, ' Press (I) to enter a subreddit, '\
+            stdscr.addstr(cs.LINES - 1, 0, ' Press (I) to enter a subreddit, '
                           + 'Press (Q) to leave')
             stdscr.chgat(cs.LINES - 1, 7, 3, cs.A_BOLD | cs.color_pair(2))
             stdscr.chgat(cs.LINES - 1, 39, 3, cs.A_BOLD | cs.color_pair(1))
@@ -162,11 +161,11 @@ def main():
         window.noutrefresh()
         text_window.noutrefresh()
         cs.doupdate()
-
     cs.nocbreak()
     cs.echo()
     cs.curs_set(1)
     cs.endwin()
+
 
 if __name__ == '__main__':
     main()
