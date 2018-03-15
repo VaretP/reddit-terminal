@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 
-import curses as cs
+import os
+import sys
+import signal
 import webbrowser
+import curses as cs
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 from pyfiglet import figlet_format
+
+
+def signal_handler(signal, frame):
+    sys.exit(0)
 
 
 def look(entry, midcol, domain_r):
@@ -168,4 +175,6 @@ def main():
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     main()
